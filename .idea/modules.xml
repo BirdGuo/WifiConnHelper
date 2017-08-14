@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/WifiConnHelper.iml" filepath="$PROJECT_DIR$/WifiConnHelper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wificonnhelperlib/wificonnhelperlib.iml" filepath="$PROJECT_DIR$/wificonnhelperlib/wificonnhelperlib.iml" />
+    </modules>
+  </component>
+</project>
