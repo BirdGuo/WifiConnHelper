@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         wifiBeensTemp = new ArrayList<>();
         buildWifiBean();
         wifiBeens.addAll(wifiBeensTemp);
+
     }
 
     private void initThread() {
