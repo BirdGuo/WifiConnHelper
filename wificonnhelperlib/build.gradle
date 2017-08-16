@@ -33,6 +33,11 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+
+    lintOptions {
+        abortOnError false
+        warning 'InvalidPackage'
+    }
 }
 
 dependencies {
@@ -60,7 +65,7 @@ def siteUrl = 'https://github.com/BirdGuo/WifiConnHelper'    // project homepage
 def gitUrl = 'https://github.com/BirdGuo/WifiConnHelper.git' // project git
 
 //发布到组织名称名字，必须填写
-group = "com.gelephant"
+group = "com.gxw" //Maven Group ID for the artifact，一般填你唯一的包名
 //发布到JCenter上的项目名字，必须填写
 def libName = "WifiConnHelper"
 // 版本号，下次更新是只需要更改版本号即可
@@ -124,6 +129,7 @@ bintray {
     }
 }
 
+
 // 配置maven库，生成POM.xml文件
 install {
     repositories.mavenInstaller {
@@ -131,6 +137,7 @@ install {
         pom {
             project {
                 packaging 'aar'
+//                artifactId 'wificonnhelperlib'//项目名称
                 // Add your description here
                 name "This is a tool to help discover and connect wifi"    //不重要
                 url siteUrl
@@ -143,9 +150,9 @@ install {
                 }
                 developers {
                     developer {
-                        id 'birdguo'
-                        name 'birdguo'
-                        email 'gxw603004002@126.com'
+                        id 'whitesnake'
+                        name 'whitesnake'
+                        email 'a603004002@126.com'
                     }
                 }
                 scm {
@@ -157,3 +164,14 @@ install {
         }
     }
 }
+
+//apply plugin: 'com.novoda.bintray-release'//添加
+////添加
+//publish {
+//    userOrg = 'whitesnake'//bintray.com用户名
+//    groupId = 'com.whitesnake'//jcenter上的路径
+//    artifactId = 'WifiConnHelper'//项目名称
+//    publishVersion = '1.0.0'//版本号
+//    desc = 'This is a tool to help discover and connect wifi'//描述，不重要
+//    website = 'https://github.com/BirdGuo/WifiConnHelper'//网站，不重要；尽量模拟github上的地址，例如我这样的；当然你有地址最好了
+//}
