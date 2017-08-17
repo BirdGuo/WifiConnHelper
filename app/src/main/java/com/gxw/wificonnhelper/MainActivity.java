@@ -291,13 +291,11 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
     @Override
     public void onWifiConnectStart(String ssid, String bssid) {
         LogUtil.showInfo(TAG, ssid + " 正在连接 ");
-//        reflashWifiList();
 
     }
 
     @Override
     public void onWifiConnectSuccess(String ssid, String bssid) {
-//        Toast.makeText(this, "连接成功", Toast.LENGTH_LONG).show();
         LogUtil.showInfo(TAG, ssid + " 连接成功 ");
         reflashWifiList();
 
@@ -305,24 +303,15 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
 
     @Override
     public void onWifiConnnectFail(String ssid, String bssid, int reason) {
-//        Toast.makeText(this, "连接失败", Toast.LENGTH_LONG).show();
         LogUtil.showInfo(TAG, ssid + " 连接失败 " + reason);
         reflashWifiList();
     }
 
-//    @Override
-//    public void OnWifiConnectCompleted(boolean isConnected, String ssid, String bssid, String password, int reason) {
-//
-//        LogUtil.showInfo(TAG, ssid + " " + isConnected + " " + reason);
-//
-//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         runScan = false;
-        LogUtil.showInfo(TAG, "------------------onDestroy-------------");
-//        WifiConnectorNew.removeReceive();
         build.removeReceive();
     }
 }
