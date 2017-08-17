@@ -1,19 +1,17 @@
 apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 26
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        jackOptions {
-            enabled false
-        }
     }
     buildTypes {
         debug{
@@ -25,7 +23,7 @@ android {
         }
         release {
             minifyEnabled false
-            buildConfigField "boolean", "LOGISSHOW", "false"
+            buildConfigField "boolean", "LOGISSHOW", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -45,13 +43,23 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
 }
 
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+//在windows上要这么写
+retrolambda {
+    jdk System.getenv("JAVA_HOME")
+    oldJdk System.getenv("JAVA_HOME")
+    javaVersion JavaVersion.VERSION_1_7
+//    jvmArgs '-arg1', '-arg2'
+    defaultMethods true
+    incremental true
 }
 
 /** 以下开始是将Android Library上传到jcenter的相关配置**/
@@ -164,14 +172,3 @@ install {
         }
     }
 }
-
-//apply plugin: 'com.novoda.bintray-release'//添加
-////添加
-//publish {
-//    userOrg = 'whitesnake'//bintray.com用户名
-//    groupId = 'com.whitesnake'//jcenter上的路径
-//    artifactId = 'WifiConnHelper'//项目名称
-//    publishVersion = '1.0.0'//版本号
-//    desc = 'This is a tool to help discover and connect wifi'//描述，不重要
-//    website = 'https://github.com/BirdGuo/WifiConnHelper'//网站，不重要；尽量模拟github上的地址，例如我这样的；当然你有地址最好了
-//}

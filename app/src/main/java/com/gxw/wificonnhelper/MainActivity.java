@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,15 +29,17 @@ import android.widget.Toast;
 import com.gxw.wificonnhelper.adapter.WifiAdapter;
 import com.gxw.wificonnhelperlib.utils.LogUtil;
 import com.gxw.wificonnhelperlib.utils.WifiAdmin;
-import com.gxw.wificonnhelperlib.utils.WifiConnector;
+import com.gxw.wificonnhelperlib.utils.WifiConnListener;
+import com.gxw.wificonnhelperlib.utils.WifiConnectorNew;
 import com.gxw.wificonnhelperlib.utils.bean.WifiBean;
+import com.gxw.wificonnhelperlib.utils.bean.WifiBeanConn;
 
 import java.util.ArrayList;
 
 /**
  * The type Main activity.
  */
-public class MainActivity extends AppCompatActivity implements MyItemClickListener, WifiConnector.WifiConnectListener {
+public class MainActivity extends AppCompatActivity implements MyItemClickListener, WifiConnListener {
 
     private String TAG = MainActivity.class.getName().toString();
 
@@ -53,8 +56,9 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
     private Button btn_dialog_cancel, btn_dialog_sure;
     private AlertDialog dialogPWD;
 
-    private WifiConnector wifiConnector;
+    //    private WifiConnector wifiConnector;
     private WifiAdmin wifiAdmin;
+    private WifiConnectorNew build;
 
     private boolean runScan = true;
 
@@ -132,11 +136,11 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         builder.setView(dialogView);
         dialogPWD = builder.create();
 
-        tv_dialog_ssid = dialogView.findViewById(R.id.tv_dialog_ssid);
-        et_dialog = dialogView.findViewById(R.id.et_dialog);
-        btn_dialog_cancel = dialogView.findViewById(R.id.btn_dialog_cancel);
-        btn_dialog_sure = dialogView.findViewById(R.id.btn_dialog_sure);
-        cb_dialog = dialogView.findViewById(R.id.cb_dialog);
+        tv_dialog_ssid = (TextView) dialogView.findViewById(R.id.tv_dialog_ssid);
+        et_dialog = (EditText) dialogView.findViewById(R.id.et_dialog);
+        btn_dialog_cancel = (Button) dialogView.findViewById(R.id.btn_dialog_cancel);
+        btn_dialog_sure = (Button) dialogView.findViewById(R.id.btn_dialog_sure);
+        cb_dialog = (CheckBox) dialogView.findViewById(R.id.cb_dialog);
 
         cb_dialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +167,11 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
                 String pwd = et_dialog.getText().toString();
                 if (!TextUtils.isEmpty(pwd) && pwd.length() > 7 && scanResultNeedToConn != null) {
                     dialogPWD.dismiss();
-                    wifiConnector.connect(scanResultNeedToConn.SSID, pwd, scanResultNeedToConn.BSSID, wifiAdmin.secretMode(scanResultNeedToConn));
+//                    wifiConnector.connect(scanResultNeedToConn.SSID, pwd, scanResultNeedToConn.BSSID, wifiAdmin.secretMode(scanResultNeedToConn));
+
+                    build.addWifiBeanConn(new WifiBeanConn(pwd, scanResultNeedToConn)).connectWithSSID(MainActivity.this);
+
+                    et_dialog.setText("");
                 } else {
                     Toast.makeText(MainActivity.this, "密码必须大于等于8位", Toast.LENGTH_LONG).show();
                 }
@@ -177,11 +185,14 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         wifiAdmin = new WifiAdmin(this);
         //打开WiFi
         wifiAdmin.openWifi();
-        wifiConnector = new WifiConnector(this, this);
+//        wifiConnector = new WifiConnector(this, this);
         wifiBeens = new ArrayList<>();
         wifiBeensTemp = new ArrayList<>();
         buildWifiBean();
         wifiBeens.addAll(wifiBeensTemp);
+
+        build = new WifiConnectorNew(this);
+
 
     }
 
@@ -229,42 +240,46 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
     @Override
     public void onItemClickListener(View view, int postion) {
 
-        ScanResult result = wifiBeensTemp.get(postion).getScanResult();
+        Log.i(TAG, wifiBeens.size() + "postion:" + postion);
 
-        LogUtil.showInfo(TAG, "连接到：" + result.SSID);
+        if (postion > 0 && postion < (wifiBeens.size() - 1)) {
+            ScanResult result = wifiBeens.get(postion).getScanResult();
 
-        String ssid = result.SSID;
+            LogUtil.showInfo(TAG, "连接到：" + result.SSID);
+
+            String ssid = result.SSID;
 //        tv_dialog_ssid.setText("连接到"+result.SSID);
 //        dialogPWD.show();
 
-        String connectWifiSSID = wifiAdmin.getConnectWifiSSID(view.getContext());
-        if (ssid.equalsIgnoreCase(connectWifiSSID)) {//已连接到当前wifi
-            Toast.makeText(view.getContext(), "已连接到当前wifi", Toast.LENGTH_LONG).show();
-        } else {//未连接
+            String connectWifiSSID = wifiAdmin.getConnectWifiSSID(view.getContext());
+            if (ssid.equalsIgnoreCase(connectWifiSSID)) {//已连接到当前wifi
+                Toast.makeText(view.getContext(), "已连接到当前wifi", Toast.LENGTH_LONG).show();
+            } else {//未连接
 
-            WifiConfiguration exsits = wifiConnector.isExsits(ssid);
-            if (exsits != null) {//曾经连接过
-                wifiConnector.connect(exsits);//连接
-            } else {//未连接过
+//            WifiConfiguration exsits = wifiConnector.isExsits(ssid);
+                WifiConfiguration exsits = wifiAdmin.isExsits(ssid);
+                if (exsits != null) {//曾经连接过
+//                wifiConnector.connect(exsits);//连接
+                    build.addWifiConfig(exsits).connectWithConfig(this);
+                } else {//未连接过
 
-                //判断是否有密码
-                boolean b = wifiAdmin.hasPwd(result);
-                LogUtil.showInfo(TAG, result.SSID + " has pwd is " + b);
+                    //判断是否有密码
+                    if (wifiAdmin.hasPwd(result)) {
+                        //标识有密码
+                        tv_dialog_ssid.setText("连接到" + result.SSID);
+                        scanResultNeedToConn = result;
 
-                if (wifiAdmin.hasPwd(result)) {
-                    //标识有密码
-                    tv_dialog_ssid.setText("连接到" + result.SSID);
-                    scanResultNeedToConn = result;
-                    dialogPWD.show();
-                } else {//无密码
-                    wifiConnector.connect(result.SSID, "", result.BSSID, wifiAdmin.secretMode(result));
+                        if (!MainActivity.this.isFinishing()) {
+                            dialogPWD.show();
+                        }
+                    } else {//无密码
+//                    wifiConnector.connect(result.SSID, "", result.BSSID, wifiAdmin.secretMode(result));
+                        build.addWifiBeanConn(new WifiBeanConn("", result)).connectWithSSID(this);
+                    }
                 }
 
-
             }
-
         }
-
 
     }
 
@@ -275,8 +290,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
 
     @Override
     public void onWifiConnectStart(String ssid, String bssid) {
-        LogUtil.showInfo(TAG, ssid + " 正在连接 " + ssid);
-
+        LogUtil.showInfo(TAG, ssid + " 正在连接 ");
 //        reflashWifiList();
 
     }
@@ -296,16 +310,19 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         reflashWifiList();
     }
 
-    @Override
-    public void OnWifiConnectCompleted(boolean isConnected, String ssid, String bssid, String password, int reason) {
-
-        LogUtil.showInfo(TAG, ssid + " " + isConnected + " " + reason);
-
-    }
+//    @Override
+//    public void OnWifiConnectCompleted(boolean isConnected, String ssid, String bssid, String password, int reason) {
+//
+//        LogUtil.showInfo(TAG, ssid + " " + isConnected + " " + reason);
+//
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         runScan = false;
+        LogUtil.showInfo(TAG, "------------------onDestroy-------------");
+//        WifiConnectorNew.removeReceive();
+        build.removeReceive();
     }
 }

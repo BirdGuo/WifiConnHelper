@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.gxw.wificonnhelper"
         minSdkVersion 18
-        targetSdkVersion 26
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -15,6 +15,11 @@ android {
         }
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -24,16 +29,27 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+        // 对于dex 的--multi-dex 选项设置与预编译的library工程有冲突,如果你的应用中包含引用的lirary工程,需要将预编译设置为false:
+        preDexLibraries = true
+    }
+    //解决红米崩溃问题
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
 }
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:design:25.3.1'
     testCompile 'junit:junit:4.12'
     compile project(path: ':wificonnhelperlib')
 }

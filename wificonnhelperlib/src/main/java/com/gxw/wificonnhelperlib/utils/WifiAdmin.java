@@ -477,7 +477,9 @@ public class WifiAdmin {
             WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             ssid = wifiInfo.getSSID();
-            ssid = ssid.substring(1, ssid.length() - 1);
+            if (!TextUtils.isEmpty(ssid)) {
+                ssid = ssid.substring(1, ssid.length() - 1);
+            }
         }
         return ssid;
     }
@@ -564,6 +566,71 @@ public class WifiAdmin {
             sm = WifiConnector.SecurityMode.OPEN;
         }
         return sm;
+    }
+
+    /**
+     * Is exsits wifi configuration.
+     *
+     * @param SSID
+     *         the ssid
+     *
+     * @return the wifi configuration
+     */
+    public WifiConfiguration isExsits(String SSID) {
+        List<WifiConfiguration> existingConfigs = mWifiManager.getConfiguredNetworks();
+        for (WifiConfiguration existingConfig : existingConfigs) {
+            if (existingConfig.SSID.equals("\"" + SSID + "\"")) {
+                return existingConfig;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Remove exit config.
+     *
+     * @param ssid
+     *         the ssid
+     */
+    public void removeExitConfig(String ssid) {
+        WifiConfiguration exsits = isExsits(ssid);
+        if (exsits != null) {//如果已经连接过则删除
+            mWifiManager.removeNetwork(exsits.networkId);
+        }
+
+    }
+
+    /**
+     * 断开所有
+     */
+    public void dissconnectAll() {
+        mWifiManager.disconnect();
+    }
+
+    /**
+     * 获得最高优先级
+     *
+     * @return 最大优先级
+     */
+    public int getMaxPriority() {
+        final List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
+        int pri = 0;
+        for (WifiConfiguration config : configurations) {
+            if (config.priority > pri) {
+                pri = config.priority;
+            }
+        }
+        return pri;
+    }
+
+    /**
+     * 打卡wifi
+     */
+    public void openWiif() {
+        //如果WIFI没有打开，则打开WIFI
+        if (!mWifiManager.isWifiEnabled()) {
+            mWifiManager.setWifiEnabled(true);
+        }
     }
 
 }

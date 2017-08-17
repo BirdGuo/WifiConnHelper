@@ -92,11 +92,11 @@ public class WifiAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public MyHolder(View itemView, MyItemClickListener myItemClickListener) {
             super(itemView);
             this.myItemClickListener = myItemClickListener;
-            tv_item_name = itemView.findViewById(R.id.tv_item_name);
-            tv_item_frequency = itemView.findViewById(R.id.tv_item_frequency);
-            tv_item_level = itemView.findViewById(R.id.tv_item_level);
-            tv_item_type = itemView.findViewById(R.id.tv_item_type);
-            tv_item_bssid = itemView.findViewById(R.id.tv_item_bssid);
+            tv_item_name = (TextView) itemView.findViewById(R.id.tv_item_name);
+            tv_item_frequency = (TextView) itemView.findViewById(R.id.tv_item_frequency);
+            tv_item_level = (TextView) itemView.findViewById(R.id.tv_item_level);
+            tv_item_type = (TextView) itemView.findViewById(R.id.tv_item_type);
+            tv_item_bssid = (TextView) itemView.findViewById(R.id.tv_item_bssid);
             itemView.setOnClickListener(this);
         }
 

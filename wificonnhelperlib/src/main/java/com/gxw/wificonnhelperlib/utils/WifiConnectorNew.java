@@ -1,13 +1,18 @@
 package com.gxw.wificonnhelperlib.utils;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.net.wifi.ScanResult;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.NetworkInfo;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.widget.Toast;
 
 import com.gxw.wificonnhelperlib.utils.bean.WifiBeanConn;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -17,63 +22,123 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by guoxw on 2017/8/16 0016.
  *
  * @auther guoxw
- * @createTime 2017/8/16 0016 17:03
+ * @createTime 2017 /8/16 0016 17:03
  * @packageName com.gxw.wificonnhelperlib.utils
  */
-//通知连接结果的监听接口
 public class WifiConnectorNew {
 
     private static WifiConnectorNew wifiConnectorNew;
     private Context mContext;
 
     private WifiManager mWifiManager;
+    private WifiAdmin wifiAdmin;
+
     private Lock mLock;
     private Condition mCondition;
-
     private WifiBeanConn wifiBeanConn;
-    private WifiConfiguration wifiConfiguration;
 
+    private WifiConfiguration wifiConfiguration;
     private boolean mIsConnnected = false;
+
+    private int reason = -1;
     private int mNetworkID = -1;
 
-    private WifiConnectorNew(Context context) {
+    private WiFiConnectReceiver mWifiConnectReceiver;
+
+    private static boolean isConnecting = false;
+    private static boolean isRegReceive = false;
+
+    public WifiConnectorNew(Context context) {
         this.mContext = context;
         mLock = new ReentrantLock();
         mCondition = mLock.newCondition();
         mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+
+        wifiAdmin = new WifiAdmin(context);
+
+        mWifiConnectReceiver = new WiFiConnectReceiver();
     }
 
+    public static WifiConnectorNew build(Context context) {
+
+        wifiConnectorNew = new WifiConnectorNew(context);
+        return wifiConnectorNew;
+    }
+
+    /**
+     * Add wifi bean conn wifi connector new.
+     *
+     * @param wifiBeanConn
+     *         the wifi bean conn
+     *
+     * @return the wifi connector new
+     */
     public WifiConnectorNew addWifiBeanConn(WifiBeanConn wifiBeanConn) {
         this.wifiBeanConn = wifiBeanConn;
         return this;
     }
 
+    /**
+     * Add wifi config wifi connector new.
+     *
+     * @param wifiConfiguration
+     *         the wifi configuration
+     *
+     * @return the wifi connector new
+     */
     public WifiConnectorNew addWifiConfig(WifiConfiguration wifiConfiguration) {
         this.wifiConfiguration = wifiConfiguration;
         return this;
     }
 
-    public void connectWifiHasPwd(WifiConnListener wifiConnListener) {
-        dissconnectAll();
-        wifiConnListener.onWifiConnectStart(wifiBeanConn.getScanResult().SSID, wifiBeanConn.getScanResult().BSSID);
+    /**
+     * 链接没有密码的wifi
+     *
+     * @param wifiConnListener
+     *         the wifi conn listener
+     */
+    public void connectWithSSID(WifiConnListener wifiConnListener) {
+        if (!isConnecting) {
+            wifiAdmin.dissconnectAll();
+            wifiConnListener.onWifiConnectStart(wifiBeanConn.getScanResult().SSID, wifiBeanConn.getScanResult().BSSID);
+            isConnecting = true;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    wifiAdmin.openWiif();
+
+//                    //注册连接结果监听对象
+//                    mContext.registerReceiver(mWifiConnectReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
+
+                    regReceive();
+
+                    if (onConnectWithSSID()) {//连接成功
+                        wifiConnListener.onWifiConnectSuccess(wifiBeanConn.getScanResult().SSID, wifiBeanConn.getScanResult().BSSID);
+                    } else {//连接失败
+                        wifiConnListener.onWifiConnnectFail(wifiBeanConn.getScanResult().SSID, wifiBeanConn.getScanResult().BSSID, reason);
+                    }
+
+                    removeReceive();
+
+                    isConnecting = false;
+                }
+            }).start();
+        } else {
+            Toast.makeText(mContext, "正在连接请稍后", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
-    public void connectWifiNoPwd() {
-    }
-
-    public void connectWifiConnected() {
-    }
-
-    private boolean onConnect() {
+    private boolean onConnectWithSSID() {
 
         //移除原有保存
-        removeExitConfig(wifiBeanConn.getScanResult().SSID);
+        wifiAdmin.removeExitConfig(wifiBeanConn.getScanResult().SSID);
 
         //添加新的网络配置
         WifiConfiguration cfg = new WifiConfiguration();
         cfg.SSID = "\"" + wifiBeanConn.getScanResult().SSID + "\"";
-        WifiConnector.SecurityMode securityMode = secretMode(wifiBeanConn.getScanResult());
+        WifiConnector.SecurityMode securityMode = wifiAdmin.secretMode(wifiBeanConn.getScanResult());
         if (securityMode == WifiConnector.SecurityMode.WEP) {
             cfg.wepKeys[0] = "\"" + wifiBeanConn.getPassword() + "\"";
             cfg.wepTxKeyIndex = 0;
@@ -95,7 +160,7 @@ public class WifiConnectorNew {
         mNetworkID = mWifiManager.addNetwork(cfg);
         mLock.lock();
         cfg.networkId = mNetworkID;
-        int newPri = getMaxPriority() + 1;
+        int newPri = wifiAdmin.getMaxPriority() + 1;
         cfg.priority = newPri;//提高优先级
 
         mWifiManager.updateNetwork(cfg);//更新
@@ -124,78 +189,146 @@ public class WifiConnectorNew {
         mLock.unlock();
 
 
-        return true;
+        return mIsConnnected;
     }
 
     /**
-     * Is exsits wifi configuration.
+     * 链接已连接过的WiFi
      *
-     * @param SSID
-     *         the ssid
-     *
-     * @return the wifi configuration
+     * @param wifiConnListener
+     *         the wifi conn listener
      */
-    public WifiConfiguration isExsits(String SSID) {
-        List<WifiConfiguration> existingConfigs = mWifiManager.getConfiguredNetworks();
-        for (WifiConfiguration existingConfig : existingConfigs) {
-            if (existingConfig.SSID.equals("\"" + SSID + "\"")) {
-                return existingConfig;
-            }
-        }
-        return null;
-    }
+    public void connectWithConfig(WifiConnListener wifiConnListener) {
+        if (!isConnecting) {
+            wifiAdmin.dissconnectAll();
+            wifiConnListener.onWifiConnectStart(wifiConfiguration.SSID, wifiConfiguration.BSSID);
+            isConnecting = true;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    wifiAdmin.openWiif();
+//                    //注册连接结果监听对象
+//                    mContext.registerReceiver(mWifiConnectReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
 
-    /**
-     * Remove exit config.
-     *
-     * @param ssid
-     *         the ssid
-     */
-    public void removeExitConfig(String ssid) {
-        WifiConfiguration exsits = isExsits(ssid);
-        if (exsits != null) {//如果已经连接过则删除
-            mWifiManager.removeNetwork(exsits.networkId);
-        }
+                    regReceive();
 
-    }
+                    if (onConnectWithConfig()) {
+                        wifiConnListener.onWifiConnectSuccess(wifiConfiguration.SSID, wifiConfiguration.BSSID);
+                    } else {
+                        wifiConnListener.onWifiConnnectFail(wifiConfiguration.SSID, wifiConfiguration.BSSID, reason);
+                    }
 
-    /**
-     * 断开所有
-     */
-    public void dissconnectAll() {
-        mWifiManager.disconnect();
-    }
+                    removeReceive();
 
-    /**
-     * 返回加密类型
-     *
-     * @param scanResult
-     *         the scan result
-     *
-     * @return wifi connector . security mode
-     */
-    public WifiConnector.SecurityMode secretMode(ScanResult scanResult) {
-        WifiConnector.SecurityMode sm = null;
-        String capabilities = scanResult.capabilities;
-        if (capabilities.contains("WPA") || capabilities.contains("WPS")) {
-            sm = WifiConnector.SecurityMode.WPA2;
-        } else if (capabilities.contains("WEP")) {
-            sm = WifiConnector.SecurityMode.WEP;
+                    isConnecting = false;
+                }
+            }).start();
         } else {
-            sm = WifiConnector.SecurityMode.OPEN;
+            Toast.makeText(mContext, "正在连接请稍后", Toast.LENGTH_SHORT).show();
         }
-        return sm;
     }
 
-    private int getMaxPriority() {
-        final List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
-        int pri = 0;
-        for (WifiConfiguration config : configurations) {
-            if (config.priority > pri) {
-                pri = config.priority;
-            }
+    private boolean onConnectWithConfig() {
+
+        //添加网络配置
+        int networkId1 = wifiConfiguration.networkId;
+        mNetworkID = mWifiManager.addNetwork(wifiConfiguration);
+        if (mNetworkID == -1) {
+            mNetworkID = networkId1;
         }
-        return pri;
+        mLock.lock();
+        // Make it the highest priority.
+        int newPri = wifiAdmin.getMaxPriority() + 1;
+        wifiConfiguration.networkId = mNetworkID;
+        wifiConfiguration.priority = newPri;//提高优先级
+        mWifiManager.updateNetwork(wifiConfiguration);//更新
+        mIsConnnected = false;
+        mWifiManager.saveConfiguration();//保存
+
+        boolean b = mWifiManager.enableNetwork(mNetworkID, true);
+        //连接该网络
+        if (!b) {
+            mLock.unlock();
+            return false;
+        }
+
+        boolean connect = mWifiManager.reassociate();
+        if (!connect) {
+            mLock.unlock();
+            return false;
+        }
+
+        try {
+            //等待连接结果
+            mCondition.await(Constants.WIFI_CONNECT_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        mLock.unlock();
+
+
+        return mIsConnnected;
+    }
+
+    /**
+     * 监听系统的WIFI连接广播
+     */
+    private class WiFiConnectReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (!WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+                return;
+            }
+
+            mLock.lock();
+            int authState = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
+            if (authState == WifiManager.ERROR_AUTHENTICATING) {//身份验证错误到这儿
+                //提示密码错误
+                reason = 1;
+            }
+            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+            if (info.getState().equals(NetworkInfo.State.DISCONNECTED)) {
+            } else if (info.getState().equals(NetworkInfo.State.CONNECTED)) {
+                //获取当前wifi名称
+                WifiInfo info2 = mWifiManager.getConnectionInfo();
+
+                if (info2.getNetworkId() == mNetworkID && info2.getSupplicantState() == SupplicantState.COMPLETED) {//这儿可能报空指针
+                    mIsConnnected = true;
+                    mCondition.signalAll();
+                }
+            }
+
+            mLock.unlock();
+        }
+    }
+
+    private void regReceive() {
+
+        //注册连接结果监听对象
+        mContext.registerReceiver(mWifiConnectReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
+        isRegReceive = true;
+
+    }
+
+    /**
+     * 移除广播
+     */
+    public void removeReceive() {
+        //删除注册的监听类对象
+        //http://stackoverflow.com/questions/6165070/receiver-not-registered-exception-error
+        try {
+            if (mContext != null && mWifiConnectReceiver != null && isRegReceive) {
+//                mCondition.signalAll();
+//                mLock.unlock();
+                mContext.unregisterReceiver(mWifiConnectReceiver);
+                isRegReceive = false;
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 
 }
