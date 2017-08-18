@@ -57,8 +57,8 @@ public class WifiAdmin {
 
     /**
      * Open wifi.
+     * 打开WIFI
      */
-// 打开WIFI
     public void openWifi() {
         if (!mWifiManager.isWifiEnabled()) {
             mWifiManager.setWifiEnabled(true);
@@ -67,8 +67,8 @@ public class WifiAdmin {
 
     /**
      * Close wifi.
+     * 关闭WIFI
      */
-// 关闭WIFI
     public void closeWifi() {
         if (mWifiManager.isWifiEnabled()) {
             mWifiManager.setWifiEnabled(false);
@@ -77,26 +77,26 @@ public class WifiAdmin {
 
     /**
      * Check state int.
+     * 检查当前WIFI状态
      *
      * @return the int
      */
-// 检查当前WIFI状态
     public int checkState() {
         return mWifiManager.getWifiState();
     }
 
     /**
      * Acquire wifi lock.
+     * 锁定WifiLock
      */
-// 锁定WifiLock
     public void acquireWifiLock() {
         mWifiLock.acquire();
     }
 
     /**
      * Release wifi lock.
+     * 解锁WifiLock
      */
-// 解锁WifiLock
     public void releaseWifiLock() {
         // 判断时候锁定
         if (mWifiLock.isHeld()) {
@@ -106,42 +106,25 @@ public class WifiAdmin {
 
     /**
      * Creat wifi lock.
+     * 创建一个WifiLock
      */
-// 创建一个WifiLock
     public void creatWifiLock() {
         mWifiLock = mWifiManager.createWifiLock("Test");
     }
 
     /**
      * Gets configuration.
+     * 得到配置好的网络
      *
      * @return the configuration
      */
-// 得到配置好的网络
     public List<WifiConfiguration> getConfiguration() {
         return mWifiConfiguration;
     }
 
     /**
-     * Connect configuration.
-     *
-     * @param index
-     *         the index
-     */
-// 指定配置好的网络进行连接
-    public void connectConfiguration(int index) {
-        // 索引大于配置好的网络索引返回
-        if (index > mWifiConfiguration.size()) {
-            return;
-        }
-        // 连接配置好的指定ID的网络
-        mWifiManager.enableNetwork(mWifiConfiguration.get(index).networkId,
-                true);
-    }
-
-
-    /**
      * Start scan.
+     * 开始扫描
      */
     public void startScan() {
         mWifiManager.startScan();
@@ -181,10 +164,10 @@ public class WifiAdmin {
 
     /**
      * Gets wifi list 24 g.
+     * 得到网络列表
      *
      * @return the wifi list 24 g
      */
-// 得到网络列表
     public ArrayList<ScanResult> getWifiList24G() {
         ArrayList<ScanResult> newSr = new ArrayList<ScanResult>();
         for (ScanResult result : m24GData) {
@@ -196,10 +179,10 @@ public class WifiAdmin {
 
     /**
      * Gets wifi list all.
+     * 得到网络列表
      *
      * @return the wifi list all
      */
-// 得到网络列表
     public ArrayList<ScanResult> getWifiListAll() {
         ArrayList<ScanResult> newSr = new ArrayList<ScanResult>();
         for (ScanResult result : mAllData) {
@@ -231,10 +214,10 @@ public class WifiAdmin {
 
     /**
      * Look up scan string builder.
+     * 查看扫描结果
      *
      * @return the string builder
      */
-// 查看扫描结果
     public StringBuilder lookUpScan() {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < mWifiList.size(); i++) {
@@ -250,63 +233,63 @@ public class WifiAdmin {
 
     /**
      * Gets mac address.
+     * 得到MAC地址
      *
      * @return the mac address
      */
-// 得到MAC地址
     public String getMacAddress() {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.getMacAddress();
     }
 
     /**
      * Gets bssid.
+     * 得到接入点的BSSID
      *
      * @return the bssid
      */
-// 得到接入点的BSSID
     public String getBSSID() {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.getBSSID();
     }
 
     /**
      * Gets ip address.
+     * 得到IP地址
      *
      * @return the ip address
      */
-// 得到IP地址
     public int getIPAddress() {
         return (mWifiInfo == null) ? 0 : mWifiInfo.getIpAddress();
     }
 
     /**
      * Gets network id.
+     * 得到连接的ID
      *
      * @return the network id
      */
-// 得到连接的ID
     public int getNetworkId() {
         return (mWifiInfo == null) ? 0 : mWifiInfo.getNetworkId();
     }
 
     /**
      * Gets wifi info.
+     * 得到WifiInfo的所有信息包
      *
      * @return the wifi info
      */
-// 得到WifiInfo的所有信息包
     public String getWifiInfo() {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.toString();
     }
 
     /**
      * Add network int.
+     * 添加一个网络并连接
      *
      * @param wcg
      *         the wcg
      *
      * @return the int
      */
-// 添加一个网络并连接
     public int addNetwork(WifiConfiguration wcg) {
         int wcgID = mWifiManager.addNetwork(wcg);
         boolean b = mWifiManager.enableNetwork(wcgID, true);
@@ -315,93 +298,14 @@ public class WifiAdmin {
 
     /**
      * Disconnect wifi.
+     * 断开指定wifi
      *
      * @param netId
      *         the net id
      */
-// 断开指定ID的网络
     public void disconnectWifi(int netId) {
         mWifiManager.disableNetwork(netId);
         mWifiManager.disconnect();
-    }
-
-    /**
-     * Disconnect wifi no id.
-     */
-    public void disconnectWifiNoId() {
-        mWifiManager.disconnect();
-    }
-
-    //然后是一个实际应用方法，只验证过没有密码的情况：
-
-    /**
-     * 添加wifi
-     *
-     * @param SSID
-     *         wifi名
-     * @param Password
-     *         密码
-     * @param Type
-     *         1：未知；2：无密码 3：有密码
-     *
-     * @return wifi configuration
-     */
-    public WifiConfiguration CreateWifiInfo(String SSID, String Password, int Type) {
-        WifiConfiguration config = new WifiConfiguration();
-        config.allowedAuthAlgorithms.clear();
-        config.allowedGroupCiphers.clear();
-        config.allowedKeyManagement.clear();
-        config.allowedPairwiseCiphers.clear();
-        config.allowedProtocols.clear();
-        config.SSID = "\"" + SSID + "\"";
-
-        WifiConfiguration tempConfig = this.IsExsits(SSID);
-        if (tempConfig != null) {
-            mWifiManager.removeNetwork(tempConfig.networkId);
-        }
-
-        if (Type == 1) //WIFICIPHER_NOPASS
-        {
-            config.wepKeys[0] = "";
-            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            config.wepTxKeyIndex = 0;
-        }
-        if (Type == 2) //WIFICIPHER_WEP
-        {
-            config.hiddenSSID = true;
-            config.wepKeys[0] = "\"" + Password + "\"";
-            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            config.wepTxKeyIndex = 0;
-        }
-        if (Type == 3) //WIFICIPHER_WPA
-        {
-            config.preSharedKey = "\"" + Password + "\"";
-            config.hiddenSSID = true;
-            config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-            config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-            config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            //config.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-            config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-            config.status = WifiConfiguration.Status.ENABLED;
-        }
-        return config;
-    }
-
-    private WifiConfiguration IsExsits(String SSID) {
-        List<WifiConfiguration> existingConfigs = mWifiManager.getConfiguredNetworks();
-        for (WifiConfiguration existingConfig : existingConfigs) {
-            if (existingConfig.SSID.equals("\"" + SSID + "\"")) {
-                return existingConfig;
-            }
-        }
-        return null;
     }
 
     /**
@@ -555,21 +459,22 @@ public class WifiAdmin {
      *
      * @return wifi connector . security mode
      */
-    public WifiConnector.SecurityMode secretMode(ScanResult scanResult) {
-        WifiConnector.SecurityMode sm = null;
+    public WifiSecurityMode secretMode(ScanResult scanResult) {
+        WifiSecurityMode sm = null;
         String capabilities = scanResult.capabilities;
         if (capabilities.contains("WPA") || capabilities.contains("WPS")) {
-            sm = WifiConnector.SecurityMode.WPA2;
+            sm = WifiSecurityMode.WPA2;
         } else if (capabilities.contains("WEP")) {
-            sm = WifiConnector.SecurityMode.WEP;
+            sm = WifiSecurityMode.WEP;
         } else {
-            sm = WifiConnector.SecurityMode.OPEN;
+            sm = WifiSecurityMode.OPEN;
         }
         return sm;
     }
 
     /**
      * Is exsits wifi configuration.
+     * 判断是否已经连接过
      *
      * @param SSID
      *         the ssid
@@ -588,6 +493,7 @@ public class WifiAdmin {
 
     /**
      * Remove exit config.
+     * 移除已经连接过的
      *
      * @param ssid
      *         the ssid
@@ -621,16 +527,6 @@ public class WifiAdmin {
             }
         }
         return pri;
-    }
-
-    /**
-     * 打卡wifi
-     */
-    public void openWiif() {
-        //如果WIFI没有打开，则打开WIFI
-        if (!mWifiManager.isWifiEnabled()) {
-            mWifiManager.setWifiEnabled(true);
-        }
     }
 
 }

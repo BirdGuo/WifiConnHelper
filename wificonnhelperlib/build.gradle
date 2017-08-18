@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
+//apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
@@ -52,15 +52,15 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-//在windows上要这么写
-retrolambda {
-    jdk System.getenv("JAVA_HOME")
-    oldJdk System.getenv("JAVA_HOME")
-    javaVersion JavaVersion.VERSION_1_7
-//    jvmArgs '-arg1', '-arg2'
-    defaultMethods true
-    incremental true
-}
+////在windows上要这么写
+//retrolambda {
+//    jdk System.getenv("JAVA_HOME")
+//    oldJdk System.getenv("JAVA_HOME")
+//    javaVersion JavaVersion.VERSION_1_7
+////    jvmArgs '-arg1', '-arg2'
+//    defaultMethods true
+//    incremental true
+//}
 
 /** 以下开始是将Android Library上传到jcenter的相关配置**/
 

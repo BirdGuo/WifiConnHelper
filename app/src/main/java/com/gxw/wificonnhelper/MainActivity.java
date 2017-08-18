@@ -30,7 +30,7 @@ import com.gxw.wificonnhelper.adapter.WifiAdapter;
 import com.gxw.wificonnhelperlib.utils.LogUtil;
 import com.gxw.wificonnhelperlib.utils.WifiAdmin;
 import com.gxw.wificonnhelperlib.utils.WifiConnListener;
-import com.gxw.wificonnhelperlib.utils.WifiConnectorNew;
+import com.gxw.wificonnhelperlib.utils.WifiConnector;
 import com.gxw.wificonnhelperlib.utils.bean.WifiBean;
 import com.gxw.wificonnhelperlib.utils.bean.WifiBeanConn;
 
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
 
     //    private WifiConnector wifiConnector;
     private WifiAdmin wifiAdmin;
-    private WifiConnectorNew build;
+    private WifiConnector build;
 
     private boolean runScan = true;
 
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         buildWifiBean();
         wifiBeens.addAll(wifiBeensTemp);
 
-        build = new WifiConnectorNew(this);
+        build = new WifiConnector(this);
 
 
     }
