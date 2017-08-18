@@ -77,7 +77,7 @@ group = "com.gxw" //Maven Group ID for the artifact，一般填你唯一的包�
 //发布到JCenter上的项目名字，必须填写
 def libName = "WifiConnHelper"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.0.0"
+version = "1.0.1"
 /**  上面配置后上传至jcenter后的编译路径是这样的： compile 'cn.bluemobi.dylan:sqlitelibrary:1.0'  **/
 
 //group = "com.gxw"// Maven Group ID for the artifact，一般填你唯一的包名
