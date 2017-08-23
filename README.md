@@ -8,7 +8,7 @@ Add dependencies in build.gradle.
 
 ```groovy
     dependencies {
-        compile 'com.gxw:wificonnhelperlib:1.0.1'
+        compile 'com.gxw:wificonnhelperlib:1.0.2'
     }
 ```
 

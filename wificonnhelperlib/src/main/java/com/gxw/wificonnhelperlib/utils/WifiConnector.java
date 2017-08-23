@@ -179,13 +179,13 @@ public class WifiConnector {
         }
         //添加网络配置
         mNetworkID = mWifiManager.addNetwork(cfg);
-        mLock.lock();
         cfg.networkId = mNetworkID;
         int newPri = wifiAdmin.getMaxPriority() + 1;
         cfg.priority = newPri;//提高优先级
 
         mWifiManager.updateNetwork(cfg);//更新
         mWifiManager.saveConfiguration();//保存
+        mLock.lock();
         mIsConnnected = false;
         //连接该网络
         if (!mWifiManager.enableNetwork(mNetworkID, true)) {//enableNetwork(id,true)断开其他，false不断开
@@ -193,12 +193,15 @@ public class WifiConnector {
             return false;
         }
 
-        boolean reassociate = mWifiManager.reassociate();
-
-        if (!reassociate) {
-            mLock.unlock();
-            return false;
-        }
+        /**
+         * 即使已经存在，重新连接到当前活动的接入点连接的。 这可能导致异步传送状态改变事件。
+         */
+//        boolean reassociate = mWifiManager.reassociate();
+//
+//        if (!reassociate) {
+//            mLock.unlock();
+//            return false;
+//        }
 
         try {
             //等待连接结果
@@ -257,7 +260,6 @@ public class WifiConnector {
         if (mNetworkID == -1) {
             mNetworkID = networkId1;
         }
-        mLock.lock();
         // Make it the highest priority.
         int newPri = wifiAdmin.getMaxPriority() + 1;
         wifiConfiguration.networkId = mNetworkID;
@@ -265,6 +267,7 @@ public class WifiConnector {
         mWifiManager.updateNetwork(wifiConfiguration);//更新
         mIsConnnected = false;
         mWifiManager.saveConfiguration();//保存
+        mLock.lock();
 
         boolean b = mWifiManager.enableNetwork(mNetworkID, true);
         //连接该网络
@@ -273,11 +276,11 @@ public class WifiConnector {
             return false;
         }
 
-        boolean connect = mWifiManager.reassociate();
-        if (!connect) {
-            mLock.unlock();
-            return false;
-        }
+//        boolean connect = mWifiManager.reassociate();
+//        if (!connect) {
+//            mLock.unlock();
+//            return false;
+//        }
 
         try {
             //等待连接结果
