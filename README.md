@@ -1,7 +1,7 @@
 # WifiConnHelper
 Help connect wifi
 
-##Usage
+## Usage
 
 ### Step 1
 Add dependencies in build.gradle.
