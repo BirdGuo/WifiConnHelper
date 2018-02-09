@@ -167,9 +167,8 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
                 String pwd = et_dialog.getText().toString();
                 if (!TextUtils.isEmpty(pwd) && pwd.length() > 7 && scanResultNeedToConn != null) {
                     dialogPWD.dismiss();
-//                    wifiConnector.connect(scanResultNeedToConn.SSID, pwd, scanResultNeedToConn.BSSID, wifiAdmin.secretMode(scanResultNeedToConn));
-
-                    build.addWifiBeanConn(new WifiBeanConn(pwd, scanResultNeedToConn)).connectWithSSID(MainActivity.this);
+//                    build.addWifiBeanConn(new WifiBeanConn(pwd, scanResultNeedToConn)).connectWithSSID(MainActivity.this);
+                    build.addWifiBeanConn(new WifiBeanConn(pwd, scanResultNeedToConn)).connectByInnerMethod();
 
                     et_dialog.setText("");
                 } else {
@@ -242,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
 
         Log.i(TAG, wifiBeens.size() + "postion:" + postion);
 
-        if (postion > 0 && postion < (wifiBeens.size() - 1)) {
+        if (postion >= 0 && postion < (wifiBeens.size() - 1)) {
             ScanResult result = wifiBeens.get(postion).getScanResult();
 
             LogUtil.showInfo(TAG, "连接到：" + result.SSID);

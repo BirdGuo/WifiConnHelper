@@ -3,10 +3,10 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -15,7 +15,7 @@ android {
     }
     buildTypes {
         debug{
-            shrinkResources true
+//            shrinkResources true
             minifyEnabled false
             buildConfigField "boolean", "LOGISSHOW", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

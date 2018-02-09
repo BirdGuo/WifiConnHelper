@@ -25,6 +25,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +59,7 @@ public class WifiAdmin {
     /**
      * 构造器
      *
-     * @param context
-     *         the context
+     * @param context the context
      */
     public WifiAdmin(Context context) {
         // 取得WifiManager对象
@@ -211,11 +212,8 @@ public class WifiAdmin {
     /**
      * 判断一个扫描结果中，是否包含了某个名称的WIFI
      *
-     * @param sr
-     *         扫描结果
-     * @param scanResult
-     *         要查询的名称
-     *
+     * @param sr         扫描结果
+     * @param scanResult 要查询的名称
      * @return 返回true表示包含了该名称的WIFI ，返回false表示不包含
      */
     public boolean containName(List<ScanResult> sr, ScanResult scanResult) {
@@ -301,9 +299,7 @@ public class WifiAdmin {
      * Add network int.
      * 添加一个网络并连接
      *
-     * @param wcg
-     *         the wcg
-     *
+     * @param wcg the wcg
      * @return the int
      */
     public int addNetwork(WifiConfiguration wcg) {
@@ -316,8 +312,7 @@ public class WifiAdmin {
      * Disconnect wifi.
      * 断开指定wifi
      *
-     * @param netId
-     *         the net id
+     * @param netId the net id
      */
     public void disconnectWifi(int netId) {
         mWifiManager.disableNetwork(netId);
@@ -327,9 +322,7 @@ public class WifiAdmin {
     /**
      * 是否连接WIFI
      *
-     * @param context
-     *         the context
-     *
+     * @param context the context
      * @return boolean boolean
      */
     public boolean isWifiConnected(Context context) {
@@ -345,9 +338,7 @@ public class WifiAdmin {
     /**
      * 获取连接wifi的bssid
      *
-     * @param context
-     *         the context
-     *
+     * @param context the context
      * @return bSSID /若无连接则返回空
      */
     public String getConnectWifiBSSID(Context context) {
@@ -365,9 +356,7 @@ public class WifiAdmin {
     /**
      * 获取连接wifi的bssid
      *
-     * @param context
-     *         the context
-     *
+     * @param context the context
      * @return bSSID /若无连接则返回空
      */
     public WifiInfo getConnectWifi(Context context) {
@@ -384,9 +373,7 @@ public class WifiAdmin {
     /**
      * 获取连接wifi的bssid
      *
-     * @param context
-     *         the context
-     *
+     * @param context the context
      * @return bSSID /若无连接则返回空
      */
     public String getConnectWifiSSID(Context context) {
@@ -408,9 +395,7 @@ public class WifiAdmin {
     /**
      * 获取连接id
      *
-     * @param context
-     *         the context
-     *
+     * @param context the context
      * @return connect wifi net work id
      */
     public int getConnectWifiNetWorkID(Context context) {
@@ -429,11 +414,8 @@ public class WifiAdmin {
     /**
      * 判断是否为当前连接wifi
      *
-     * @param context
-     *         the context
-     * @param ssid
-     *         唯一识别号
-     *
+     * @param context the context
+     * @param ssid    唯一识别号
      * @return boolean boolean
      */
     public boolean isWifiConnected(Context context, String ssid) {
@@ -453,9 +435,7 @@ public class WifiAdmin {
     /**
      * 判断是否有密码
      *
-     * @param scanResult
-     *         the scan result
-     *
+     * @param scanResult the scan result
      * @return boolean
      */
     public boolean hasPwd(ScanResult scanResult) {
@@ -470,9 +450,7 @@ public class WifiAdmin {
     /**
      * 返回加密类型
      *
-     * @param scanResult
-     *         the scan result
-     *
+     * @param scanResult the scan result
      * @return wifi connector . security mode
      */
     public WifiSecurityMode secretMode(ScanResult scanResult) {
@@ -492,9 +470,7 @@ public class WifiAdmin {
      * Is exsits wifi configuration.
      * 判断是否已经连接过
      *
-     * @param SSID
-     *         the ssid
-     *
+     * @param SSID the ssid
      * @return the wifi configuration
      */
     public WifiConfiguration isExsits(String SSID) {
@@ -511,8 +487,7 @@ public class WifiAdmin {
      * Remove exit config.
      * 移除已经连接过的
      *
-     * @param ssid
-     *         the ssid
+     * @param ssid the ssid
      */
     public void removeExitConfig(String ssid) {
         WifiConfiguration exsits = isExsits(ssid);

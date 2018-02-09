@@ -26,6 +26,10 @@ import android.net.wifi.ScanResult;
  * @packageName com.gxw.wificonnhelperlib.utils.bean
  */
 
+/**
+ * 自定义wifi类
+ * 包含密码和扫描到wifi状态
+ */
 public class WifiBeanConn {
 
     private String password = "";
