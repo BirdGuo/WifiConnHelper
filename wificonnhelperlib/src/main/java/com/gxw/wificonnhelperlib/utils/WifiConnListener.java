@@ -24,37 +24,33 @@ package com.gxw.wificonnhelperlib.utils;
  * @packageName com.gxw.wificonnhelperlib.utils
  */
 
+/**
+ * Wifi连接接口回调
+ */
 public interface WifiConnListener {
 
     /**
-     * On wifi connect start.
+     * Wifi开始连接接口回调
      *
-     * @param ssid
-     *         the ssid
-     * @param bssid
-     *         the bssid
+     * @param ssid  wifi名称
+     * @param bssid ip
      */
     void onWifiConnectStart(String ssid, String bssid);
 
     /**
-     * On wifi connect success.
+     * Wifi连接成功接口回调
      *
-     * @param ssid
-     *         the ssid
-     * @param bssid
-     *         the bssid
+     * @param ssid  wifi名称
+     * @param bssid ip
      */
     void onWifiConnectSuccess(String ssid, String bssid);
 
     /**
-     * On wifi connnect fail.
+     * Wifi连接失败接口回调
      *
-     * @param ssid
-     *         the ssid
-     * @param bssid
-     *         the bssid
-     * @param reason
-     *         the reason
+     * @param ssid  wifi名称
+     * @param bssid ip
+     * @param reason 失败原因
      */
     void onWifiConnnectFail(String ssid, String bssid, int reason);
 

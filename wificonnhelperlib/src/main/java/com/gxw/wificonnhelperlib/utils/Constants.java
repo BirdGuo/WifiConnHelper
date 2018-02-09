@@ -24,6 +24,13 @@ package com.gxw.wificonnhelperlib.utils;
  * @packageName com.gxw.wificonnhelperlib.utils
  */
 
+/**
+ * 常量类
+ */
 public class Constants {
-    public static final int WIFI_CONNECT_TIMEOUT = 15; //连接WIFI的超时时间
+
+    /**
+     * WIFI连接超时时间
+     */
+    public static final int WIFI_CONNECT_TIMEOUT = 15;
 }

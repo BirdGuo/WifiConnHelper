@@ -32,12 +32,25 @@ import android.net.wifi.ScanResult;
  */
 public class WifiBeanConn {
 
+    /**
+     * 密码
+     */
     private String password = "";
+
+    /**
+     * Wifi信息
+     *
+     * @see android.net.wifi.ScanResult
+     */
     private ScanResult scanResult;
 
     public WifiBeanConn() {
     }
 
+    /**
+     * @param password   密码
+     * @param scanResult Wifi信息
+     */
     public WifiBeanConn(String password, ScanResult scanResult) {
         this.password = password;
         this.scanResult = scanResult;

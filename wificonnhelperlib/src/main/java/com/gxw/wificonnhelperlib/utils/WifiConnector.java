@@ -43,6 +43,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * @createTime 2017 /8/16 0016 17:03
  * @packageName com.gxw.wificonnhelperlib.utils
  */
+
+/**
+ * Wifi连接操作类
+ */
 public class WifiConnector {
 
     /**
@@ -134,6 +138,7 @@ public class WifiConnector {
      *
      * @param wifiBeanConn the wifi bean conn
      * @return the wifi connector new
+     * @see com.gxw.wificonnhelperlib.utils.bean.WifiBeanConn
      */
     public WifiConnector addWifiBeanConn(WifiBeanConn wifiBeanConn) {
         this.wifiBeanConn = wifiBeanConn;
@@ -145,6 +150,7 @@ public class WifiConnector {
      *
      * @param wifiConfiguration the wifi configuration
      * @return the wifi connector new
+     * @see android.net.wifi.WifiConfiguration
      */
     public WifiConnector addWifiConfig(WifiConfiguration wifiConfiguration) {
         this.wifiConfiguration = wifiConfiguration;
@@ -154,7 +160,8 @@ public class WifiConnector {
     /**
      * 链接没有密码的wifi
      *
-     * @param wifiConnListener the wifi conn listener
+     * @param wifiConnListener
+     * @see com.gxw.wificonnhelperlib.utils.WifiConnListener
      */
     public void connectWithSSID(WifiConnListener wifiConnListener) {
         if (!isConnecting) {
@@ -280,6 +287,7 @@ public class WifiConnector {
      * 链接已连接过的WiFi
      *
      * @param wifiConnListener the wifi conn listener
+     * @see com.gxw.wificonnhelperlib.utils.WifiConnListener
      */
     public void connectWithConfig(WifiConnListener wifiConnListener) {
         if (!isConnecting) {

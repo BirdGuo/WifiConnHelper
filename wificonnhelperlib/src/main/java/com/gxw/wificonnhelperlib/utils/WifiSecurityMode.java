@@ -23,18 +23,25 @@ package com.gxw.wificonnhelperlib.utils;
  * @createTime 2017/8/16 0016 17:09
  * @packageName com.gxw.wificonnhelperlib.utils
  */
+
+/**
+ * Wifi加密类型
+ */
 public enum WifiSecurityMode {
     /**
-     * Open security mode.
+     * 无密码
      */
-    OPEN, /**
-     * Wep security mode.
+    OPEN,
+    /**
+     * WEP加密模式
      */
-    WEP, /**
-     * Wpa security mode.
+    WEP,
+    /**
+     * WPA加密模式
      */
-    WPA, /**
-     * Wpa 2 security mode.
+    WPA,
+    /**
+     * WPA2加密模式
      */
     WPA2
 }

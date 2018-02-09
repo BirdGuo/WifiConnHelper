@@ -26,9 +26,23 @@ import android.net.wifi.ScanResult;
  * @packageName com.gxw.wificonnectdemo.bean
  */
 
+/**
+ * wifi信息类，用于wifi列表展示
+ */
 public class WifiBean {
 
-    private  boolean isConnect;
+    /**
+     * 是否已连接
+     * true 已连接
+     * false 未连接
+     */
+    private boolean isConnect;
+
+    /**
+     * Wifi信息
+     *
+     * @see android.net.wifi.ScanResult
+     */
     private ScanResult scanResult;
 
     public WifiBean() {
